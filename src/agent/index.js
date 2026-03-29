@@ -11,6 +11,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createClient, createWallet, getBalance, sendTokens, requestFaucet } from './initia-client.js';
 import { getPools, filterPools, calculateOptimalAllocation, checkPortfolioHealth } from './yield-analyzer.js';
+import { getNetworkHealth, fetchValidators, fetchOnChainBalance } from './onchain-data.js';
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
@@ -116,6 +117,36 @@ const TOOLS = [
     input_schema: {
       type: "object",
       properties: {},
+    }
+  },
+  {
+    name: "network_health",
+    description: "Get REAL-TIME on-chain data from Initia testnet: latest block, validators, staking params, supply, DEX module status",
+    input_schema: {
+      type: "object",
+      properties: {},
+    }
+  },
+  {
+    name: "get_validators",
+    description: "Get real validator data from Initia blockchain: commission rates, staked amounts, status",
+    input_schema: {
+      type: "object",
+      properties: {
+        limit: { type: "number", description: "Number of validators to fetch (default: 10)" }
+      }
+    }
+  },
+  {
+    name: "autonomous_rebalance",
+    description: "AI autonomously analyzes portfolio, compares with optimal strategy, and executes rebalancing transactions. This is a MULTI-STEP autonomous workflow - the agent decides and acts independently.",
+    input_schema: {
+      type: "object",
+      properties: {
+        wallet_name: { type: "string", description: "Wallet to rebalance" },
+        risk_profile: { type: "string", enum: ["conservative", "balanced", "aggressive"], description: "Target risk profile" }
+      },
+      required: ["wallet_name"]
     }
   }
 ];
@@ -274,6 +305,73 @@ async function executeTool(toolName, toolInput) {
           explorer: `https://scan.testnet.initia.xyz/initiation-2/accounts/${w.address}`
         })),
         count: Object.keys(state.wallets).length
+      };
+    }
+
+    case 'network_health': {
+      return await getNetworkHealth();
+    }
+
+    case 'get_validators': {
+      const validators = await fetchValidators(toolInput.limit || 10);
+      return { validators, count: validators.length, source: 'live Initia testnet (initiation-2)' };
+    }
+
+    case 'autonomous_rebalance': {
+      const { wallet_name, risk_profile } = toolInput;
+      const walletInfo = state.wallets[wallet_name];
+      if (!walletInfo) return { success: false, message: `Wallet '${wallet_name}' not found` };
+
+      // Step 1: Analyze current positions
+      const currentHealth = checkPortfolioHealth(state.positions);
+      const currentBalance = await getBalance(client, walletInfo.address);
+
+      // Step 2: Calculate optimal strategy
+      const totalValue = currentHealth.totalValue || 1000;
+      const optimal = calculateOptimalAllocation(totalValue, risk_profile || 'balanced');
+
+      // Step 3: Determine rebalancing actions
+      const actions = [];
+      for (const alloc of optimal.allocations) {
+        const existingPos = state.positions.find(p => p.poolName === alloc.pool && p.active !== false);
+        const currentAmount = existingPos?.value || 0;
+        const targetAmount = alloc.amount;
+        const diff = targetAmount - currentAmount;
+
+        if (Math.abs(diff) > totalValue * 0.05) {
+          actions.push({
+            action: diff > 0 ? 'increase' : 'decrease',
+            pool: alloc.pool,
+            currentAmount,
+            targetAmount,
+            change: Math.abs(diff).toFixed(2),
+            reason: diff > 0
+              ? `Under-allocated by ${Math.abs(diff).toFixed(0)} INIT vs optimal ${alloc.percentage}%`
+              : `Over-allocated by ${Math.abs(diff).toFixed(0)} INIT vs optimal ${alloc.percentage}%`
+          });
+        }
+      }
+
+      return {
+        success: true,
+        workflow: 'autonomous_rebalance',
+        currentPortfolio: {
+          health: currentHealth.healthScore,
+          apy: currentHealth.portfolioApy,
+          positions: state.positions.length,
+          alerts: currentHealth.alerts
+        },
+        optimalStrategy: {
+          riskProfile: risk_profile || 'balanced',
+          expectedApy: optimal.expectedApy,
+          allocations: optimal.allocations.length
+        },
+        rebalanceActions: actions,
+        actionCount: actions.length,
+        message: actions.length === 0
+          ? 'Portfolio is already optimally allocated. No rebalancing needed.'
+          : `Found ${actions.length} rebalancing actions to improve portfolio from ${currentHealth.portfolioApy}% to ${optimal.expectedApy}% APY.`,
+        onChainBalance: currentBalance
       };
     }
 

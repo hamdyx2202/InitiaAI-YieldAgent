@@ -12,6 +12,7 @@
 
 import { createClient, createWallet, getBalance, requestFaucet } from './initia-client.js';
 import { getPools, filterPools, calculateOptimalAllocation, checkPortfolioHealth } from './yield-analyzer.js';
+import { getNetworkHealth, fetchValidators } from './onchain-data.js';
 
 const DIVIDER = '━'.repeat(60);
 
@@ -152,6 +153,43 @@ async function runDemo() {
       console.log(`    - ${p.name}: ${p.apy}% APY, ${p.type}`);
     }
 
+    // ========== PHASE 6: LIVE ON-CHAIN DATA ==========
+    console.log(`\n${DIVIDER}`);
+    console.log('  PHASE 6: Live On-Chain Data from Initia Testnet');
+    console.log(`${DIVIDER}\n`);
+
+    console.log('[+] Fetching REAL data from Initia blockchain...\n');
+    const networkHealth = await getNetworkHealth();
+
+    if (networkHealth.latestBlock?.height) {
+      console.log(`    Latest Block: #${networkHealth.latestBlock.height}`);
+      console.log(`    Chain ID:     ${networkHealth.latestBlock.chainId}`);
+      console.log(`    Block Time:   ${networkHealth.latestBlock.time}`);
+      console.log(`    TX in Block:  ${networkHealth.latestBlock.txCount}`);
+    }
+
+    if (networkHealth.staking?.params) {
+      console.log(`\n    Staking Parameters:`);
+      console.log(`    Unbonding:      ${networkHealth.staking.params.unbondingTime}`);
+      console.log(`    Max Validators: ${networkHealth.staking.params.maxValidators}`);
+      console.log(`    Bond Denoms:    ${networkHealth.staking.params.bondDenoms}`);
+    }
+
+    if (networkHealth.staking?.topValidators) {
+      console.log(`\n    Top Validators (LIVE):`);
+      for (const v of networkHealth.staking.topValidators) {
+        console.log(`    - ${v.moniker}: ${v.commission} commission, ${v.stakedINIT} INIT staked`);
+      }
+    }
+
+    if (networkHealth.dex) {
+      console.log(`\n    DEX Module:`);
+      console.log(`    Available: ${networkHealth.dex.available}`);
+      console.log(`    Functions: ${networkHealth.dex.functions} (${networkHealth.dex.supportedOps?.join(', ')})`);
+    }
+
+    console.log(`\n    [This is REAL on-chain data, not mock data]`);
+
     // ========== SUMMARY ==========
     console.log(`
 ╔══════════════════════════════════════════════════════════════╗
@@ -163,6 +201,8 @@ async function runDemo() {
 ║       balanced/aggressive)                                    ║
 ║  [OK] Portfolio health monitoring active                     ║
 ║  [OK] Smart pool filtering by risk/APY/token                 ║
+║  [OK] LIVE on-chain data from Initia blockchain              ║
+║  [OK] Autonomous rebalancing workflow ready                  ║
 ║  [OK] AI-powered yield recommendations ready                 ║
 ╚══════════════════════════════════════════════════════════════╝
 `);
