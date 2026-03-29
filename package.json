@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "agent": "node src/agent/index.js",
-    "demo": "node src/agent/demo.js"
+    "demo": "node src/agent/demo.js",
+    "server": "node src/agent/server.js"
   },
   "keywords": [
     "initia",

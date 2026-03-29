@@ -116,8 +116,10 @@ contract YieldVault {
     function agentDeposit(address user, uint256 poolId) external payable onlyAgent {
         require(poolId < pools.length, "Invalid pool");
         require(pools[poolId].active, "Pool inactive");
+        require(msg.value > 0, "Zero deposit");
 
         Strategy memory strat = userStrategies[user];
+        require(strat.maxRiskLevel > 0, "User has no strategy set");
         require(pools[poolId].riskLevel <= strat.maxRiskLevel, "Exceeds risk tolerance");
 
         positions.push(Position(user, poolId, msg.value, block.timestamp, true));
@@ -136,7 +138,10 @@ contract YieldVault {
     /**
      * @notice Withdraw from a position
      */
-    function withdraw(uint256 positionId) external {
+    bool private _locked;
+    modifier nonReentrant() { require(!_locked, "Reentrant"); _locked = true; _; _locked = false; }
+
+    function withdraw(uint256 positionId) external nonReentrant {
         require(positionId < positions.length, "Invalid position");
         Position storage pos = positions[positionId];
         require(pos.user == msg.sender, "Not your position");
@@ -145,6 +150,10 @@ contract YieldVault {
         uint256 elapsed = block.timestamp - pos.depositTime;
         uint256 apy = pools[pos.poolId].apy;
         uint256 reward = (pos.amount * apy * elapsed) / (365 days * 10000);
+
+        // Cap rewards to available contract balance minus other deposits
+        uint256 availableForRewards = address(this).balance > totalDeposits ? address(this).balance - totalDeposits : 0;
+        if (reward > availableForRewards) reward = availableForRewards;
         uint256 total = pos.amount + reward;
 
         pos.active = false;
@@ -152,7 +161,7 @@ contract YieldVault {
         userDeposits[msg.sender] -= pos.amount;
         totalDeposits -= pos.amount;
 
-        (bool sent, ) = msg.sender.call{value: total > address(this).balance ? address(this).balance : total}("");
+        (bool sent, ) = msg.sender.call{value: total}("");
         require(sent, "Transfer failed");
 
         emit Withdrawn(msg.sender, pos.poolId, total);

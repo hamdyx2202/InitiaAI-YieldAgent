@@ -100,7 +100,9 @@ export function getPools() {
 /**
  * Get pools filtered by criteria
  */
-export function filterPools({ maxRisk, minApy, type, token }) {
+export function filterPools({ maxRisk, max_risk, minApy, min_apy, type, token }) {
+  maxRisk = maxRisk || max_risk;
+  minApy = minApy || min_apy;
   const riskLevels = { 'very-low': 1, 'low': 2, 'medium': 3, 'high': 4 };
 
   return INITIA_POOLS.filter(pool => {
@@ -197,14 +199,19 @@ Format responses with clear sections and numbers.`,
  */
 export function checkPortfolioHealth(positions) {
   const alerts = [];
-  let totalValue = 0;
   let weightedApy = 0;
+
+  // Calculate total value first to avoid loop bug
+  let totalValue = 0;
+  for (const pos of positions) {
+    totalValue += pos.value || 0;
+  }
+  if (totalValue === 0) return { totalValue: 0, portfolioApy: 0, positionCount: 0, alerts: [], healthScore: 'empty' };
 
   for (const pos of positions) {
     const pool = INITIA_POOLS.find(p => p.id === pos.poolId);
     if (!pool) continue;
 
-    totalValue += pos.value;
     weightedApy += pool.apy * pos.value;
 
     // Check for high concentration

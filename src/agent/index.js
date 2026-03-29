@@ -195,12 +195,14 @@ async function executeTool(toolName, toolInput) {
       if (!pool) return { success: false, message: `Pool '${pool_id}' not found` };
       if (amount < pool.minDeposit) return { success: false, message: `Minimum deposit is ${pool.minDeposit} INIT` };
 
-      // Execute on-chain deposit (send to pool address as demo)
+      // Execute on-chain deposit - send to vault contract address
+      // In production: calls YieldVault.deposit(poolId). On testnet: sends to vault address as proof-of-concept
+      const VAULT_ADDRESS = process.env.VAULT_ADDRESS || 'init1yp3a7e0rx72uf8v56dxdhxqllhz09kryy69t2p';
       const walletData = createWallet(client, walletInfo.mnemonic);
       const uinitAmount = String(Math.round(amount * 1e6));
 
       try {
-        const result = await sendTokens(walletData.wallet, walletData.wallet.key.accAddress, uinitAmount);
+        const result = await sendTokens(walletData.wallet, VAULT_ADDRESS, uinitAmount);
 
         // Record position
         state.positions.push({
@@ -240,9 +242,12 @@ async function executeTool(toolName, toolInput) {
       const walletInfo = state.wallets[from_wallet];
       if (!walletInfo) return { success: false, message: `Wallet '${from_wallet}' not found` };
 
+      const parsedAmount = String(parseInt(amount) || 0);
+      if (parsedAmount === '0') return { success: false, message: 'Invalid amount' };
+
       const walletData = createWallet(client, walletInfo.mnemonic);
       try {
-        const result = await sendTokens(walletData.wallet, to_address, amount);
+        const result = await sendTokens(walletData.wallet, to_address, parsedAmount);
         state.transactions.push({
           type: 'send',
           to: to_address,
