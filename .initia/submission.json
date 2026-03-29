@@ -1,12 +1,12 @@
 {
   "project_name": "InitiaAI Yield Agent",
   "repo_url": "https://github.com/hamdyx2202/InitiaAI-YieldAgent",
-  "commit_sha": "PLACEHOLDER_WILL_UPDATE_AFTER_PUSH",
+  "commit_sha": "0c24e0b",
   "rollup_chain_id": "initiation-2",
-  "deployed_address": "PLACEHOLDER_WILL_UPDATE_AFTER_DEPLOY",
+  "deployed_address": "init1e6zvvpch3qjgt9qdy93nvq53xe70cvvjtsxca2",
   "vm": "evm",
   "native_feature": "auto-signing",
   "core_logic_path": "src/contracts/YieldVault.sol",
-  "native_feature_frontend_path": "frontend/src/App.jsx",
-  "demo_video_url": "PLACEHOLDER_WILL_UPDATE"
+  "native_feature_frontend_path": "frontend/src/main.jsx",
+  "demo_video_url": "WILL_UPDATE_AFTER_RECORDING"
 }

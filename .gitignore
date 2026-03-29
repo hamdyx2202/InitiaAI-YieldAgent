@@ -2,4 +2,5 @@ node_modules/
 .env
 *.log
 agent-state.json
+deployment.json
 frontend/dist/

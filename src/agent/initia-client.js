@@ -95,20 +95,27 @@ export async function sendTokens(wallet, recipientAddress, amount, denom = 'uini
  */
 export async function requestFaucet(address) {
   try {
-    const response = await fetch(FAUCET_URL, {
+    // Try API faucet first
+    const response = await fetch('https://faucet-api.testnet.initia.xyz/claim', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ address })
     });
 
-    if (!response.ok) {
-      const text = await response.text();
-      return { success: false, message: `Faucet error: ${text}` };
+    if (response.ok) {
+      return { success: true, message: `Funded ${address} with testnet INIT` };
     }
 
-    return { success: true, message: `Funded ${address} with testnet INIT` };
+    // If API requires CAPTCHA, provide manual instructions
+    return {
+      success: false,
+      message: `Use browser faucet: https://faucet.testnet.initia.xyz — paste address: ${address}`
+    };
   } catch (e) {
-    return { success: false, message: `Faucet error: ${e.message}` };
+    return {
+      success: false,
+      message: `Use browser faucet: https://faucet.testnet.initia.xyz — paste address: ${address}`
+    };
   }
 }
 
