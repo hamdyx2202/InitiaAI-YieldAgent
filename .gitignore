@@ -1,0 +1,5 @@
+node_modules/
+.env
+*.log
+agent-state.json
+frontend/dist/

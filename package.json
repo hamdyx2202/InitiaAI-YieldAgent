@@ -1,0 +1,37 @@
+{
+  "name": "initia-ai-yield-agent",
+  "version": "1.0.0",
+  "description": "AI-powered DeFi Yield Agent on Initia - autonomously finds and executes the best yield strategies",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "agent": "node src/agent/index.js",
+    "demo": "node src/agent/demo.js"
+  },
+  "keywords": [
+    "initia",
+    "ai-agent",
+    "defi",
+    "yield",
+    "claude",
+    "blockchain"
+  ],
+  "author": "hamdyx2202",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
+    "@initia/initia.js": "^1.0.21",
+    "@initia/interwovenkit-react": "^2.5.1",
+    "@tanstack/react-query": "^5.95.2",
+    "@vitejs/plugin-react": "^6.0.1",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "viem": "^2.47.6",
+    "vite": "^8.0.3",
+    "wagmi": "^2.17.2"
+  }
+}
