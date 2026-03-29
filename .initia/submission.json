@@ -8,5 +8,5 @@
   "native_feature": "auto-signing",
   "core_logic_path": "src/contracts/YieldVault.sol",
   "native_feature_frontend_path": "frontend/src/main.jsx",
-  "demo_video_url": "WILL_UPDATE_AFTER_RECORDING"
+  "demo_video_url": "https://www.youtube.com/watch?v=mvI2XLNAjGE"
 }

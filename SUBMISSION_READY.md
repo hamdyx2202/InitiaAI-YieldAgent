@@ -10,7 +10,7 @@ AI & Tooling
 https://github.com/hamdyx2202/InitiaAI-YieldAgent
 
 ## Demo Video
-[PASTE YOUTUBE LINK HERE]
+https://www.youtube.com/watch?v=mvI2XLNAjGE
 
 ## Short Description
 AI-powered DeFi yield optimizer on Initia — an autonomous Claude-powered agent that analyzes yield pools, calculates risk-adjusted strategies, and executes on-chain deposits with auto-signing for frictionless UX.
