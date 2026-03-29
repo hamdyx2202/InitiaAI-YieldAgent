@@ -1,7 +1,7 @@
 {
   "project_name": "InitiaAI Yield Agent",
   "repo_url": "https://github.com/hamdyx2202/InitiaAI-YieldAgent",
-  "commit_sha": "7a5e0168918f02672e69fb7fb44289a50586ded9",
+  "commit_sha": "72112b5adb37ab365f8d2f2453d1b693e9cfd3d2",
   "rollup_chain_id": "initiation-2",
   "deployed_address": "init1e6zvvpch3qjgt9qdy93nvq53xe70cvvjtsxca2",
   "vm": "evm",
