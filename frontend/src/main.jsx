@@ -5,9 +5,13 @@ import { mainnet } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   initiaPrivyWalletConnector,
+  injectStyles,
   InterwovenKitProvider,
 } from '@initia/interwovenkit-react';
 import App from './App.jsx';
+
+// Inject InterwovenKit modal styles
+injectStyles();
 
 const wagmiConfig = createConfig({
   connectors: [initiaPrivyWalletConnector],

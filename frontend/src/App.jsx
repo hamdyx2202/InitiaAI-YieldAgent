@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useInterwovenKit, useUsernameQuery } from '@initia/interwovenkit-react';
+import React, { useState, useEffect } from 'react';
+import { useInterwovenKit } from '@initia/interwovenkit-react';
 
 const POOL_COLORS = { 'very-low': '#22c55e', 'low': '#4ade80', 'medium': '#f59e0b', 'high': '#ef4444' };
 const API = '';

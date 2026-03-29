@@ -9,14 +9,10 @@ import {
   MnemonicKey,
   MsgSend,
   Coin,
-  MsgExecute,
-  bcs
 } from '@initia/initia.js';
 
 const TESTNET_REST = 'https://rest.testnet.initia.xyz';
 const TESTNET_CHAIN_ID = 'initiation-2';
-const TESTNET_RPC = 'https://rpc.testnet.initia.xyz:443';
-const FAUCET_URL = 'https://faucet.testnet.initia.xyz';
 
 /**
  * Create a REST client for Initia testnet
@@ -153,12 +149,9 @@ export async function getTxInfo(client, txHash) {
 export {
   TESTNET_REST,
   TESTNET_CHAIN_ID,
-  TESTNET_RPC,
   RESTClient,
   Wallet,
   MnemonicKey,
   MsgSend,
-  MsgExecute,
   Coin,
-  bcs
 };

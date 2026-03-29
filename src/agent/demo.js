@@ -79,7 +79,7 @@ async function runDemo() {
       const apy = `${p.apy}%`.padEnd(9);
       const tvl = `$${(p.tvl / 1e6).toFixed(1)}M`.padEnd(9);
       const risk = p.risk.padEnd(8);
-      const type = p.type.padEnd(11);
+      const type = p.type.padEnd(14);
       console.log(`    │ ${name} │ ${apy} │ ${tvl} │ ${risk} │ ${type} │`);
     }
     console.log('    └──────────────────────┴───────────┴───────────┴──────────┴─────────────┘');
